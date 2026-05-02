@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Venture Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --card: #161616;
+      --border: rgba(255,255,255,0.08);
+      --border-hover: rgba(255,255,255,0.15);
+      --text: #f0f0f0;
+      --muted: #888;
+      --hint: #555;
+      --purple: #7F77DD;
+      --purple-bg: #1a1830;
+      --teal: #1D9E75;
+      --teal-bg: #0d2419;
+      --amber: #BA7517;
+      --amber-bg: #221a08;
+      --coral: #D85A30;
+      --coral-bg: #251208;
+      --blue: #378ADD;
+      --blue-bg: #0d1a2a;
+    }
+
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .logo { display: flex; align-items: center; gap: 12px; }
+
+    .logo-mark {
+      width: 40px; height: 40px;
+      background: var(--purple);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .logo-mark svg { width: 22px; height: 22px; }
+
+    .logo-name { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+    .logo-tag { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
+
+    .status-pill {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 12px; color: var(--teal);
+      background: var(--teal-bg);
+      border: 0.5px solid rgba(29,158,117,0.25);
+      border-radius: 20px; padding: 5px 14px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .status-dot {
+      width: 6px; height: 6px;
+      background: var(--teal); border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* Metrics */
+    .metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 2rem; }
+
+    .metric {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 10px; padding: 1rem;
+    }
+
+    .metric-label { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .metric-value { font-size: 22px; font-weight: 700; letter-spacing: -1px; }
+    .metric-sub { font-size: 11px; color: var(--hint); margin-top: 3px; }
+
+    /* Agent Grid */
+    .agents { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 1.5rem; }
+
+    .agent-card {
+      background: var(--card);
+      border: 0.5px solid var(--border);
+      border-radius: 14px; padding: 1.25rem;
+      cursor: pointer; position: relative; overflow: hidden;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .agent-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+    .agent-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .agent-card.purple::before { background: var(--purple); }
+    .agent-card.teal::before { background: var(--teal); }
+    .agent-card.amber::before { background: var(--amber); }
+    .agent-card.blue::before { background: var(--blue); }
+    .agent-card.coral::before { background: var(--coral); }
+    .agent-card.wide { grid-column: 1 / -1; }
+
+    .agent-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 1rem; }
+
+    .agent-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+
+    .icon-purple { background: var(--purple-bg); }
+    .icon-teal { background: var(--teal-bg); }
+    .icon-amber { background: var(--amber-bg); }
+    .icon-coral { background: var(--coral-bg); }
+    .icon-blue { background: var(--blue-bg); }
+
+    .agent-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+    .agent-role { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+    .agent-tasks { display: flex; flex-direction: column; gap: 7px; }
+    .task { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+    .task-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .dot-purple { background: var(--purple); }
+    .dot-teal { background: var(--teal); }
+    .dot-amber { background: var(--amber); }
+    .dot-coral { background: var(--coral); }
+    .dot-blue { background: var(--blue); }
+
+    .agent-footer {
+      margin-top: 1rem; padding-top: 1rem;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .launch-btn {
+      width: 100%; padding: 9px;
+      border-radius: 8px; font-size: 12px;
+      font-weight: 500; font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      border: 0.5px solid var(--border);
+      background: transparent; color: var(--muted);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .launch-btn:hover { background: var(--surface); color: var(--text); }
+
+    /* Wide card tasks grid */
+    .tasks-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+
+    /* Bottom grid */
+    .bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .panel {
+      background: var(--card);
+      border: 0.5px solid var(--border);
+      border-radius: 14px; padding: 1.25rem;
+    }
+
+    .panel-title { font-size: 13px; font-weight: 700; margin-bottom: 1rem; }
+
+    /* Idea board */
+    .idea-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+
+    .idea-input {
+      flex: 1; font-size: 13px;
+      font-family: 'Syne', sans-serif;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 0.5px solid var(--border);
+      background: var(--surface); color: var(--text);
+      outline: none;
+    }
+
+    .idea-input:focus { border-color: var(--purple); }
+    .idea-input::placeholder { color: var(--hint); }
+
+    .add-btn {
+      padding: 9px 16px;
+      border-radius: 8px;
+      background: var(--purple); color: white;
+      font-size: 13px; font-family: 'Syne', sans-serif;
+      font-weight: 600; border: none; cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .add-btn:hover { opacity: 0.85; }
+
+    .idea-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .idea-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px;
+      background: var(--surface);
+      border-radius: 8px;
+      font-size: 13px; color: var(--text);
+    }
+
+    .badge {
+      font-size: 10px; font-family: 'DM Mono', monospace;
+      padding: 3px 9px; border-radius: 10px;
+      margin-left: auto; flex-shrink: 0;
+    }
+
+    .badge-validate { background: #221a08; color: #BA7517; }
+    .badge-build { background: #1a1830; color: #7F77DD; }
+    .badge-test { background: #0d2419; color: #1D9E75; }
+    .badge-scale { background: #0d1a2a; color: #378ADD; }
+
+    /* Quick actions */
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .action-tile {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 10px; padding: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+      text-decoration: none;
+    }
+
+    .action-tile:hover { border-color: var(--border-hover); }
+    .action-icon { font-size: 20px; margin-bottom: 6px; }
+    .action-label { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .action-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none; position: fixed;
+      inset: 0; background: rgba(0,0,0,0.75);
+      z-index: 100; align-items: center; justify-content: center;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--card);
+      border: 0.5px solid var(--border);
+      border-radius: 16px; padding: 1.5rem;
+      width: 90%; max-width: 560px;
+    }
+
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .modal-title { font-size: 16px; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; line-height: 1; }
+    .modal-body { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    .prompt-box {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 10px; padding: 1rem;
+      font-size: 13px; color: var(--text);
+      line-height: 1.6; margin-top: 1rem;
+      white-space: pre-wrap;
+    }
+
+    .copy-btn {
+      margin-top: 1rem; width: 100%;
+      padding: 10px; border-radius: 8px;
+      background: var(--purple); color: white;
+      font-size: 13px; font-family: 'Syne', sans-serif;
+      font-weight: 600; border: none; cursor: pointer;
+    }
+
+    .copy-btn:hover { opacity: 0.85; }
+
+    @media (max-width: 600px) {
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .agents { grid-template-columns: 1fr; }
+      .agent-card.wide { grid-column: 1; }
+      .bottom { grid-template-columns: 1fr; }
+      .action-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11 3L18 7.5V14.5L11 19L4 14.5V7.5L11 3Z" stroke="white" stroke-width="1.5" fill="none"/>
+          <circle cx="11" cy="11" r="2.8" fill="white"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">AI Venture Studio</div>
+        <div class="logo-tag">Command Center</div>
+      </div>
+    </div>
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      5 agents ready
+    </div>
+  </div>
+
+  <!-- Metrics -->
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">Store Revenue</div>
+      <div class="metric-value">₹0</div>
+      <div class="metric-sub">Track via Finance Agent</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Active Products</div>
+      <div class="metric-value">—</div>
+      <div class="metric-sub">Add via Product Manager</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">MUN Committees</div>
+      <div class="metric-value">—</div>
+      <div class="metric-sub">Research pending</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">AI Tools Found</div>
+      <div class="metric-value">—</div>
+      <div class="metric-sub">Scout it now</div>
+    </div>
+  </div>
+
+  <!-- Agents -->
+  <div class="agents">
+
+    <div class="agent-card purple" onclick="openModal('Dropshipping Agent','Product Sourcing & Store Ops','Find me winning dropshipping products to sell. Analyze suppliers, market gaps, pricing strategy, and write ad copy for my store.')">
+      <div class="agent-head">
+        <div class="agent-icon icon-purple">🛒</div>
+        <div>
+          <div class="agent-name">Dropshipping Agent</div>
+          <div class="agent-role">Product Sourcing & Store Ops</div>
+        </div>
+      </div>
+      <div class="agent-tasks">
+        <div class="task"><div class="task-dot dot-purple"></div>Find winning products & niches</div>
+        <div class="task"><div class="task-dot dot-purple"></div>Supplier research & vetting</div>
+        <div class="task"><div class="task-dot dot-purple"></div>Competitor & pricing analysis</div>
+        <div class="task"><div class="task-dot dot-purple"></div>Ad copy & listing creation</div>
+      </div>
+      <div class="agent-footer"><button class="launch-btn">Launch Agent ↗</button></div>
+    </div>
+
+    <div class="agent-card teal" onclick="openModal('Product Manager','Catalog & Roadmap','Help me manage my product catalog. Write product descriptions, track inventory, and create a product roadmap for my dropshipping store.')">
+      <div class="agent-head">
+        <div class="agent-icon icon-teal">📦</div>
+        <div>
+          <div class="agent-name">Product Manager</div>
+          <div class="agent-role">Catalog & Roadmap</div>
+        </div>
+      </div>
+      <div class="agent-tasks">
+        <div class="task"><div class="task-dot dot-teal"></div>Product catalog management</div>
+        <div class="task"><div class="task-dot dot-teal"></div>Description & SEO writing</div>
+        <div class="task"><div class="task-dot dot-teal"></div>Inventory & SKU tracking</div>
+        <div class="task"><div class="task-dot dot-teal"></div>Launch planning & roadmaps</div>
+      </div>
+      <div class="agent-footer"><button class="launch-btn">Launch Agent ↗</button></div>
+    </div>
+
+    <div class="agent-card amber" onclick="openModal('Finance Agent','Store P&L & Cash Flow','Help me with financial planning for my dropshipping store. Calculate profit margins, track expenses, analyze cash flow, and create financial reports.')">
+      <div class="agent-head">
+        <div class="agent-icon icon-amber">💰</div>
+        <div>
+          <div class="agent-name">Finance Agent</div>
+          <div class="agent-role">Store P&L & Cash Flow</div>
+        </div>
+      </div>
+      <div class="agent-tasks">
+        <div class="task"><div class="task-dot dot-amber"></div>Profit margin & COGS calculator</div>
+        <div class="task"><div class="task-dot dot-amber"></div>Expense tracking & reporting</div>
+        <div class="task"><div class="task-dot dot-amber"></div>Break-even & ROI analysis</div>
+        <div class="task"><div class="task-dot dot-amber"></div>Cash flow forecasting</div>
+      </div>
+      <div class="agent-footer"><button class="launch-btn">Launch Agent ↗</button></div>
+    </div>
+
+    <div class="agent-card blue" onclick="openModal('AI Scout','New Tool Discovery','Find me the newest and best AI tools released recently. Focus on tools useful for ecommerce, dropshipping, productivity, and content creation.')">
+      <div class="agent-head">
+        <div class="agent-icon icon-blue">🔭</div>
+        <div>
+          <div class="agent-name">AI Scout</div>
+          <div class="agent-role">New Tool Discovery</div>
+        </div>
+      </div>
+      <div class="agent-tasks">
+        <div class="task"><div class="task-dot dot-blue"></div>Weekly new AI tool roundups</div>
+        <div class="task"><div class="task-dot dot-blue"></div>Tool comparisons & reviews</div>
+        <div class="task"><div class="task-dot dot-blue"></div>Ecommerce AI stack advice</div>
+        <div class="task"><div class="task-dot dot-blue"></div>Automation opportunity mapping</div>
+      </div>
+      <div class="agent-footer"><button class="launch-btn">Launch Agent ↗</button></div>
+    </div>
+
+    <div class="agent-card coral wide" onclick="openModal('MUN Research Agent','Model UN Preparation','Help me with Model UN research. I need position papers, committee background guides, resolution drafting, and debate strategy for my upcoming MUN conference.')">
+      <div class="agent-head">
+        <div class="agent-icon icon-coral">🌍</div>
+        <div>
+          <div class="agent-name">MUN Research Agent</div>
+          <div class="agent-role">Model UN Preparation & Research</div>
+        </div>
+      </div>
+      <div class="tasks-2col">
+        <div class="task"><div class="task-dot dot-coral"></div>Position paper writing</div>
+        <div class="task"><div class="task-dot dot-coral"></div>Committee background research</div>
+        <div class="task"><div class="task-dot dot-coral"></div>Resolution & clause drafting</div>
+        <div class="task"><div class="task-dot dot-coral"></div>Delegate debate strategies</div>
+        <div class="task"><div class="task-dot dot-coral"></div>Country bloc analysis</div>
+        <div class="task"><div class="task-dot dot-coral"></div>Opening speech preparation</div>
+      </div>
+      <div class="agent-footer"><button class="launch-btn">Launch Agent ↗</button></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom -->
+  <div class="bottom">
+
+    <div class="panel">
+      <div class="panel-title">Idea Pipeline</div>
+      <div class="idea-row">
+        <input class="idea-input" id="ideaInput" type="text" placeholder="New venture idea..." />
+        <button class="add-btn" onclick="addIdea()">Add</button>
+      </div>
+      <div class="idea-list" id="ideaList">
+        <div class="idea-item">Dropship pet accessories niche<span class="badge badge-validate">validate</span></div>
+        <div class="idea-item">Build AI product description tool<span class="badge badge-build">build</span></div>
+        <div class="idea-item">MUN prep template library<span class="badge badge-test">test</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Quick Actions</div>
+      <div class="action-grid">
+        <div class="action-tile" onclick="openModal('Competitor Analysis','Deep Store Research','Do a deep competitor analysis for a dropshipping store selling trending products. Give me a full breakdown of top Shopify stores, their pricing, products, and marketing strategies.')">
+          <div class="action-icon">🔍</div>
+          <div class="action-label">Competitor Analysis</div>
+          <div class="action-desc">Deep dive into rival stores</div>
+        </div>
+        <div class="action-tile" onclick="openModal('Margin Calculator','Profit & Loss Tool','Create a profit margin breakdown for my dropshipping product. Help me input product cost, shipping, ad spend, and calculate net margin and break-even point.')">
+          <div class="action-icon">📊</div>
+          <div class="action-label">Margin Calculator</div>
+          <div class="action-desc">Instant P&L for any product</div>
+        </div>
+        <div class="action-tile" onclick="openModal('Trending Products','What is Hot Right Now','What are the hottest trending products to dropship right now in India and globally? Give me current trends with demand data.')">
+          <div class="action-icon">🔥</div>
+          <div class="action-label">Trending Products</div>
+          <div class="action-desc">What is selling right now</div>
+        </div>
+        <div class="action-tile" onclick="openModal('Position Paper','MUN Document Draft','Help me write a complete MUN position paper. Ask me which committee, country, and topic I am representing.')">
+          <div class="action-icon">📝</div>
+          <div class="action-label">Position Paper</div>
+          <div class="action-desc">Draft MUN docs fast</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Agent</div>
+      <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      Copy this prompt and paste it into Claude.ai to launch this agent:
+      <div class="prompt-box" id="modalPrompt"></div>
+      <button class="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const badges = ['badge-validate','badge-build','badge-test','badge-scale'];
+  const labels = ['validate','build','test','scale'];
+
+  function addIdea() {
+    const input = document.getElementById('ideaInput');
+    const list = document.getElementById('ideaList');
+    const text = input.value.trim();
+    if (!text) return;
+    const i = Math.floor(Math.random() * badges.length);
+    const div = document.createElement('div');
+    div.className = 'idea-item';
+    div.innerHTML = text + '<span class="badge ' + badges[i] + '">' + labels[i] + '</span>';
+    list.prepend(div);
+    input.value = '';
+  }
+
+  document.getElementById('ideaInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addIdea();
+  });
+
+  let currentPrompt = '';
+
+  function openModal(title, role, prompt) {
+    document.getElementById('modalTitle').textContent = title + ' — ' + role;
+    document.getElementById('modalPrompt').textContent = prompt;
+    currentPrompt = prompt;
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closeModal(e) {
+    if (e.target === document.getElementById('modalOverlay')) {
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+  }
+
+  function copyPrompt() {
+    navigator.clipboard.writeText(currentPrompt).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy Prompt', 2000);
+    });
+  }
+</script>
+</body>
+</html>
